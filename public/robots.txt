@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ea8djl.com/blog/sitemap.xml
