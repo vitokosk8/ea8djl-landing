@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 // Lee el RSS que genera Hugo en /blog/index.xml y muestra las tres últimas entradas.
-export default function LatestPosts() {
+export default function LatestPosts({ t, locale }) {
   const [state, setState] = useState({ status: 'loading', posts: [] })
 
   useEffect(() => {
@@ -24,19 +24,14 @@ export default function LatestPosts() {
     return () => { alive = false }
   }, [])
 
-  if (state.status === 'loading') return <p className="muted">Cargando entradas…</p>
+  if (state.status === 'loading') return <p className="muted">{t.loading}</p>
 
   if (state.status === 'error')
-    return (
-      <p className="muted">
-        No se han podido cargar las entradas. Puedes leerlas directamente en <a href="/blog/">el blog</a>.
-      </p>
-    )
+    return <p className="muted">{t.error} <a href="/blog/">{t.errorLink}</a>.</p>
 
-  if (state.posts.length === 0)
-    return <p className="muted">Todavía no hay entradas publicadas. Cuando escriba la primera, aparecerá aquí.</p>
+  if (state.posts.length === 0) return <p className="muted">{t.empty}</p>
 
-  const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
+  const fmt = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' })
   return (
     <ul className="posts">
       {state.posts.map((p) => (

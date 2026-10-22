@@ -1,6 +1,6 @@
 import RouteMap from './RouteMap.jsx'
 import LatestPosts from './LatestPosts.jsx'
-import { profile, links, asns, about, trainer, lo0, community } from './data.js'
+import { profile, links, asns, trainer, content } from './data.js'
 import retrato from './assets/fotos/retrato-run-bgp.webp'
 import formacion from './assets/fotos/formacion.webp'
 import viaje from './assets/fotos/viaje.webp'
@@ -19,16 +19,27 @@ function Section({ id, title, children, aside }) {
   )
 }
 
-export default function App() {
+function LangSwitch({ t, className }) {
+  const s = t.switchTo
+  return (
+    <a className={className} href={s.href} hrefLang={s.lang} lang={s.lang}>{s.label}</a>
+  )
+}
+
+export default function App({ lang }) {
+  const t = content[lang] ?? content.en
   return (
     <>
       <header className="hero">
+        <nav className="hero__lang" aria-label={t.nav.lang}>
+          <LangSwitch t={t} className="langswitch" />
+        </nav>
         <div className="hero__text">
           <p className="hero__callsign">{profile.callsign}</p>
           <h1 className="hero__name">{profile.name}</h1>
-          <p className="hero__role">{profile.role}, {profile.place}</p>
-          <p className="hero__intro">{profile.intro}</p>
-          <nav className="hero__links" aria-label="Enlaces">
+          <p className="hero__role">{profile.role}, {t.place}</p>
+          <p className="hero__intro">{t.intro}</p>
+          <nav className="hero__links" aria-label={t.nav.main}>
             {links.map((l) => (
               <a key={l.label} href={l.href} className="button">{l.label}</a>
             ))}
@@ -36,23 +47,22 @@ export default function App() {
         </div>
         <div className="hero__visual">
           <RouteMap />
-          <img className="hero__photo" src={retrato} width="553" height="662"
-            alt="Victor Bolaños con una camiseta que dice RUN BGP, delante de una estantería de libros de redes" />
+          <img className="hero__photo" src={retrato} width="553" height="662" alt={t.alt.portrait} />
         </div>
       </header>
 
       <main>
-        <Section id="sobre-mi" title="Sobre mí"
+        <Section id="about" title={t.titles.about}
           aside={<img className="section__photo section__photo--round" src={viaje} width="400" height="400"
-            alt="Victor Bolaños en un mirador sobre la costa" loading="lazy" />}>
+            alt={t.alt.travel} loading="lazy" />}>
           <ul className="facts">
-            {about.map((t) => <li key={t}>{t}</li>)}
+            {t.about.map((x) => <li key={x}>{x}</li>)}
           </ul>
           <p className="asns">
-            Opero{' '}
+            {t.operate}{' '}
             {asns.map((a, i) => (
               <span key={a.asn}>
-                {i > 0 && ' y '}
+                {i > 0 && ` ${t.and} `}
                 <a className="asn" href={a.href}>{a.asn}</a>
               </span>
             ))}
@@ -60,38 +70,37 @@ export default function App() {
           </p>
         </Section>
 
-        <Section id="formador" title="Formador certificado">
+        <Section id="trainer" title={t.titles.trainer}>
           <figure className="figure">
-            <img src={formacion} width="687" height="665" loading="lazy"
-              alt="Victor Bolaños explicando IS-IS en una pantalla durante un curso" />
+            <img src={formacion} width="687" height="665" loading="lazy" alt={t.alt.training} />
           </figure>
           <dl className="trainer">
-            {trainer.map((t) => (
-              <div key={t.vendor} className="trainer__row">
+            {trainer.map((x) => (
+              <div key={x.vendor} className="trainer__row">
                 <dt>
-                  <span className="trainer__vendor">{t.vendor}</span>
-                  <span className="trainer__title">{t.title}</span>
+                  <span className="trainer__vendor">{x.vendor}</span>
+                  <span className="trainer__title">{x.title}</span>
                 </dt>
                 <dd>
                   <ul className="tags">
-                    {t.certs.map((c) => <li key={c}>{c}</li>)}
+                    {x.certs.map((c) => <li key={c}>{c}</li>)}
                   </ul>
                 </dd>
               </div>
             ))}
           </dl>
-          <a className="lo0" href={lo0.href}>
-            <img src={logoLo0} width="640" height="640" loading="lazy" alt="Logotipo de lo0" />
+          <a className="lo0" href={t.lo0.href}>
+            <img src={logoLo0} width="640" height="640" loading="lazy" alt={t.alt.lo0} />
             <span>
-              <strong>{lo0.name}</strong>
-              <span>{lo0.text}</span>
+              <strong>{t.lo0.name}</strong>
+              <span>{t.lo0.text}</span>
             </span>
           </a>
         </Section>
 
-        <Section id="comunidad" title="Comunidad de Internet">
+        <Section id="community" title={t.titles.community}>
           <ul className="community">
-            {community.map((c) => (
+            {t.community.map((c) => (
               <li key={c.name}>
                 <h3>{c.href ? <a href={c.href}>{c.name}</a> : c.name}</h3>
                 <p>{c.text}</p>
@@ -100,16 +109,17 @@ export default function App() {
           </ul>
         </Section>
 
-        <Section id="blog" title="Últimas entradas">
-          <LatestPosts />
-          <p><a href="/blog/">Ver todas las entradas del blog</a></p>
+        <Section id="blog" title={t.titles.blog}>
+          <LatestPosts t={t.posts} locale={t.locale} />
+          <p><a href="/blog/">{t.posts.all}</a></p>
         </Section>
       </main>
 
       <footer className="footer">
         <p>{profile.name}, {profile.callsign}</p>
-        <nav aria-label="Enlaces del pie">
+        <nav aria-label={t.nav.footer}>
           {links.map((l) => <a key={l.label} href={l.href}>{l.label}</a>)}
+          <LangSwitch t={t} />
         </nav>
       </footer>
     </>
